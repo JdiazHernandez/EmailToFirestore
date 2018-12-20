@@ -1,53 +1,97 @@
+//Initialize Firestore
 
+const Firestore = require("@google-cloud/firestore");
 
+//Firesotre configuration
 
+const firestore = new Firestore({
+  projectId: "<fIRESTORE_PRJECT_NAME>",
+  keyFilename: "./firebase-keys.json",
+  timestampsInSnapshots: true
+});
 
-var Imap = require('imap'),
-    inspect = require('util').inspect;
+//Initialize Imap and MailParser
 
-const simpleParser = require('mailparser').simpleParser;
+var Imap = require("imap"),
+  inspect = require("util").inspect;
 
+const simpleParser = require("mailparser").simpleParser;
 
-    var imap = new Imap({
-        user: 'YOUREMAIL@ACCOUNT.HERE',//If you use gmail. Be aware: Use less secure option on your email or implement XoAuth2.
-        password: 'YoUrPaSsWoRdhErE',
-        host: 'imap.gmail.com',//If you use gmail use this values below
-        port: 993,
-        tls: true
-        });
+var mail = {};
 
-        function openInbox(cb) {
-            imap.openBox('INBOX', true, cb);
-          }
+//Initialize email configuration
+//This especific set of configuration requiere that the email acount from google is
+//set as accept less secure apps.
 
-          imap.once('ready', function() {
+var imap = new Imap({
+  user: "<EMAIL_ACCOUNT>@gmail.com",
+  password: "<PASSWORD>",
+  host: "imap.gmail.com", //If you use gmail use this values below
+  port: 993,
+  tls: true
+});
 
-          openInbox(function(err, box) {
+//Open of the inbox and retrieve of emails.
 
-          if (err) throw err;
-          imap.search([ 'UNSEEN', ['SINCE', 'May 20, 2010'] ], function(err, results) {
-            if (err) throw err;
-            var f = imap.fetch(results, { bodies: '' });
-            f.on('message', function(msg, seqno) {
-              console.log('Message #%d', seqno);
-              var prefix = '(#' + seqno + ') ';
-              msg.on('body', function(stream, info) {
-                 simpleParser(stream, (err, parsed) => {
-                   console.log(prefix + 'Message');
-                   console.log('=> '+ parsed.date)
-                    //HERE NOW SHOULD GO FIREBASE ADD SEQUENCE, SO EACH EMAIL GOES SEPARATELY
+function openInbox(cb) {
+  imap.openBox("INBOX", false, cb);
+}
 
-                 });
-              });
-            });
-            f.once('error', function(err) {
-              console.log('Fetch error: ' + err);
-            });
-            f.once('end', function() {
-              console.log('Done fetching all messages!');
-              imap.end();
+imap.once("ready", function() {
+  openInbox(function(err, box) {
+    if (err) throw err;
+    //UNSEEN indicates that will retrieve any non open email
+    imap.search(["UNSEEN"], function(err, results) {
+      if (err) throw err;
+      var f = imap.fetch(results, {
+        bodies: ""
+      });
+
+      //Organize them by their sequence nummber
+      f.on("message", function(msg, seqno) {
+        //console.log('Message #%d', seqno);
+        var prefix = "(#" + seqno + ") ";
+        msg.on("body", function(stream, info) {
+          //Parsing of each email
+          simpleParser(stream, (err, parsed) => {
+            console.log("-----------");
+            console.log(prefix + "Email");
+            //console.log( parsed);
+            //Creation of the Email object for Firestore
+            mail = {
+              Date: parsed.date,
+              title: parsed.subject,
+              text: parsed.text,
+              "Email from": parsed.from.value[0].address,
+              "Email to": parsed.to.value[0].address
+            };
+            console.log(mail);
+            console.log("-----------");
+            //Firestore injection of the mail object
+            firestore.collection("Emails").add({
+              mail
             });
           });
         });
+      });
+
+      //Setting the emails as seen
+      imap.setFlags(results, ["SEEN"], function(err) {
+        if (!err) {
+          console.log("marked as read");
+        } else {
+          console.log(JSON.stringify(err, null, 2));
+        }
+      });
+
+      f.once("error", function(err) {
+        console.log("Fetch error: " + err);
+      });
+      f.once("end", function() {
+        console.log("Done fetching all messages!");
+        imap.end();
+      });
     });
-    imap.connect();
+  });
+});
+imap.connect();
