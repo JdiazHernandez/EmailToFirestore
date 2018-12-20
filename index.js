@@ -5,7 +5,7 @@ const Firestore = require("@google-cloud/firestore");
 //Firesotre configuration
 
 const firestore = new Firestore({
-  projectId: "<fIRESTORE_PRJECT_NAME>",
+  projectId: "emailtofirestore",
   keyFilename: "./firebase-keys.json",
   timestampsInSnapshots: true
 });
@@ -24,8 +24,8 @@ var mail = {};
 //set as accept less secure apps.
 
 var imap = new Imap({
-  user: "<EMAIL_ACCOUNT>@gmail.com",
-  password: "<PASSWORD>",
+  user: "jamaospokertour@gmail.com",
+  password: "soyunjamao",
   host: "imap.gmail.com", //If you use gmail use this values below
   port: 993,
   tls: true

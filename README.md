@@ -14,8 +14,8 @@ You need to have the following modules
 
 ```
 npm install firebase-admin --save
-npm install nodemailer --save
-npm install imap
+npm install mailparser --save
+npm install imap --save
 
 ```
 
@@ -37,10 +37,10 @@ By the time being, the email account is hardcode since is needed to be set as "l
 To set your Gmail account as "less secure":
 
 1. Sign in to your [Google Admin console.](https://admin.google.com/)
-···Sign in using an administrator account
+⋅⋅⋅ Sign in using an administrator account
 
 2. From the Admin console Home page, go to `Security > Basic settings`.
-···To see Security on the Home page, you might have to click More controls at the bottom.
+⋅⋅⋅ To see Security on the Home page, you might have to click More controls at the bottom.
 
 3. Under Less secure apps, select Go to settings for less secure apps.
 
@@ -52,7 +52,7 @@ To set your Gmail account as "less secure":
 Is possible to run the index.js as a standalone node.js instance.
 
 Once the app has fetch all UNSEEN emails, it automatically sets them as SEEN.
-I case of UNSEEN emails, the app stops on error, `Nothing to fecth`
+I case of no new UNSEEN emails, the app stops on error, `Nothing to fecth`
 
 
 ## Author

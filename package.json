@@ -1,0 +1,27 @@
+{
+  "name": "emailtofirestore",
+  "version": "1.0.0",
+  "description": "Small node.js app to fetch,parse,store on firestore and mark as seen emails",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JdiazHernandez/EmailToFirestore.git"
+  },
+  "keywords": [
+    "email;node.js;parse;firestore;"
+  ],
+  "author": "JDWebDev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JdiazHernandez/EmailToFirestore/issues"
+  },
+  "homepage": "https://github.com/JdiazHernandez/EmailToFirestore#readme",
+  "dependencies": {
+    "firebase-admin": "^6.4.0",
+    "imap": "^0.8.19",
+    "mailparser": "^2.4.3"
+  }
+}
